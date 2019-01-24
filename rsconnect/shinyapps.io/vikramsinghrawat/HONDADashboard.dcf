@@ -1,0 +1,12 @@
+name: HONDADashboard
+title: HONDADashboard
+username:
+account: vikramsinghrawat
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 339302
+bundleId: 1796855
+url: https://vikramsinghrawat.shinyapps.io/HONDADashboard/
+when: 1546618497.85125
+asMultiple: FALSE
+asStatic: FALSE
