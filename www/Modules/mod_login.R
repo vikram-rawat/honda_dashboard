@@ -1,5 +1,4 @@
-source('www/Modules/mod_SQL_functions.R')
-
+# source('www/Modules/mod_SQL_functions.R')
 # library(shiny)
 # library(shinydashboard)
 # library(RSQLite)
@@ -70,7 +69,6 @@ mod_login_serve <- function(input, output, session, conn_string) {
             ,
             decode_file = 'www/login/user.bin'
         )
-        
     })
     
 

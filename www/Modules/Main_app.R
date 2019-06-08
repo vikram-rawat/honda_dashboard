@@ -1,29 +1,3 @@
-# load_libraries ----------------------------------------------------------
-
-# library(shiny)
-# library(RSQLite)
-# library(shinydashboard)
-# library(plotly)
-# library(data.table)
-# library(lubridate)
-# library(dbplyr)
-# library(shinyjs)
-# library(tidyverse)
-# library(DBI)
-# library(crosstalk)
-# library(RSQLite)
-# library(DT)
-
-
-# source_code -------------------------------------------------------------
-
-source('www/Modules/select_data.R')
-source('www/Modules/dashboard_module.R')
-source('www/Modules/emp_data.R')
-source('www/Modules/CRUD_db.R')
-source('www/Modules/mod_login.R')
-source('www/Modules/mod_SQL_functions.R')
-
 # front_end ---------------------------------------------------------------
 
 main_ui <- function(id){
@@ -32,11 +6,11 @@ main_ui <- function(id){
 
 ns<-NS(id)
 
-
 # Ui_function -------------------------------------------------------------
     dashboardPage(dashboardHeader(title = 'HR Dashboard',
                                   tags$li(actionLink(ns("openModal"),
-                                                     label = "", icon = icon("sign-out")),
+                                                     label = "", 
+                                                     icon = icon("sign-out")),
                                           class = "dropdown")
                                   ),
                   dashboardSidebar(sidebarMenuOutput(ns('sidebar_ui'))),
@@ -92,18 +66,13 @@ main_server <- function(input, output, session) {
     
     fulldata<-callModule(mod_select_data_serve,'sql',sqlite)
     
-    
-    
     # show_dashboard ----------------------------------------------------------
     
-    
     callModule(mod_dashboard_serve,'dashboardpage',sqlite,fulldata)
-    
     
     # show_employee -----------------------------------------------------------
     
     callModule(mod_emp_serve,'employee',sqlite,fulldata)
-    
     
     # show_passwords ----------------------------------------------------------
     
@@ -121,7 +90,6 @@ main_server <- function(input, output, session) {
                                       tabName = 'login_tab'),
                              selected='login_menu')
                      })
-                         
                  }else if( role$value=='Visitor'){
                      output$sidebar_ui<-renderMenu({
                          sidebarMenu(id = ns('conditional_sidebar'),
@@ -138,7 +106,6 @@ main_server <- function(input, output, session) {
                                  tabName = 'employee_tab'
                              ))  
                      })
-                     
                  }else if( role$value=='Admin'){
                      output$sidebar_ui<-renderMenu({
                        
@@ -163,12 +130,8 @@ main_server <- function(input, output, session) {
                          )  
                      })
                  }
-                 
-                 
-                 })
-    
-
-    # # signoutbutton -----------------------------------------------------------
+            })
+    # signoutbutton -----------------------------------------------------------
     # observeEvent(role$value,{
     # if(role$value !='Nothing'){
     #     output$signout<-renderUI({

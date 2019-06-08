@@ -1,23 +1,3 @@
-
-
-# load_library ------------------------------------------------------------
-
-
-# library(shiny)
-# library(shinydashboard)
-# library(plotly)
-# library(data.table)
-# library(lubridate)
-# library(dbplyr)
-# library(dplyr)
-# library(ggplot2)
-# library(magrittr)
-# library(DBI)
-# library(crosstalk)
-# library(RSQLite)
-# library(DT)
-
-
 # UI_function -------------------------------------------------------------
 
 
@@ -37,7 +17,7 @@ mod_select_data_ui <- function(id) {
             downloadButton(ns('download_button'),
                            'Download File')
         ),
-        mainPanel(dataTableOutput(ns('sql_data')))
+        mainPanel(DTOutput(ns('sql_data')))
     )
     
     
@@ -54,25 +34,24 @@ mod_select_data_serve <- function(input, output, session,sqlite) {
     # namespace ---------------------------------------------------------------
     
     ns <- session$ns
-    
-    
-    
+
     # download_data -----------------------------------------------------------
     
     fulldata <- reactive({
         req(input$sql_date_filter)
         req(input$sql_org_filter)
         
+        minDate <- input$sql_date_filter[1]
+        maxDate <- input$sql_date_filter[2]
+        org <- input$sql_org_filter
         
-        data1 <-
-            sqlite() %>%
-            tbl('employee_data') %>%
-            filter(between(date
-                           , input$sql_date_filter[1]
-                           , input$sql_date_filter[2])) %>%
-            filter(organization %in% input$sql_org_filter) %>%
-            collect()
-        
+        data1 <- sqlite() %>%
+                 tbl('employee_data') %>%
+                 filter(between(date
+                               , minDate
+                               , maxDate)) %>%
+                 filter(organization %in% org) %>%
+                 collect()
         
         data1 %>% setDT()
         
@@ -84,15 +63,11 @@ mod_select_data_serve <- function(input, output, session,sqlite) {
         data1[is.na(overtime), overtime := 0]
         setorder(data1, date)
         data1[, cum := cumsum(overtime), emp_code]
-        
-        data1[, line_color := ifelse(cum <= 20,
-                                     'black',
-                                     ifelse(
-                                         cum %between% c(20.01, 40),
-                                         'green',
-                                         ifelse(cum %between% c(40.01, 49), 'orange', 'red')
+        suppressWarnings(data1[,line_color:= ''])
+        data1[, line_color := ifelse(cum <= 20,'black',
+                ifelse(cum %between% c(20.01, 40),'green',
+                ifelse(cum %between% c(40.01, 49), 'orange', 'red')
                                      ))]
-        
         
         setkey(data1, emp_code)
         
@@ -116,7 +91,7 @@ mod_select_data_serve <- function(input, output, session,sqlite) {
               )]
         
         
-        data1[,new_overtime:=new_overtime * new_scales]
+        data1[,new_overtime:=(new_overtime * new_scales)]
         
         
         data1[,moving_avg:= TTR::WMA(new_overtime,9),emp_code]
@@ -124,11 +99,9 @@ mod_select_data_serve <- function(input, output, session,sqlite) {
         data1[is.na(moving_avg),moving_avg:=0]
         
         data1[,moving_avg:=round(moving_avg,2)]
-        
-        
-        
-        
-        
+
+        data1
+
     })
     
     # sql_data ----------------------------------------------------------------

@@ -69,7 +69,8 @@ decrypt_sql<-function(sql_con,sql_table,decode_file){
         
         if(nrow(table)>0){
         
-        table[, (colnames(table)) := lapply(.SD, as.character), .SDcols = colnames(table)]
+        table[, (colnames(table)) := lapply(.SD, as.character)
+              ,.SDcols = colnames(table)]
         
         table %>% setDF()
         
